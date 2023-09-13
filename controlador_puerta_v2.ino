@@ -46,7 +46,7 @@ volatile float pulsos = 0;
 
 long tiempo;
 
-bool buscar_posFinal= true; // Para prueba 
+bool buscar_posFinal= true; // Para prueba se puede desactivar
 
 
 void setup() {
