@@ -3,7 +3,7 @@
 #define CERRADO 0
 #define ABIERTO 1
 #define IS_WORKING 2
-#define VEL_MAX 255     //230
+#define VEL_MAX 230     //230
 #define VEL_FRENADO 20  //10
 #define SI true
 #define NO false
@@ -46,7 +46,7 @@ volatile float pulsos = 0;
 
 long tiempo;
 
-bool buscar_posFinal= true; // Para prueba se puede desactivar
+bool buscar_posFinal= true; // Para prueba se puede desactivar 
 
 
 void setup() {
@@ -63,7 +63,7 @@ void setup() {
   detenerMotor(NO);
   delay(500);
   Serial.println("Iniciando Sistema...");
-  buscarPosFinal(true, CERRANDO, 30); 
+  buscarPosFinal(true, CERRANDO, 50); 
 }
 
 
@@ -71,6 +71,7 @@ void setup() {
 //ICACHE_RAM_ATTR
 void increment() {
   pulsos++;
+  dis_recorrido_pulsos++;
 }
 
 void buscarPosFinal(boolean close, byte dir, byte velocidad) {
@@ -90,11 +91,9 @@ void buscarPosFinal(boolean close, byte dir, byte velocidad) {
   do {
     now = millis();
     if (now - t > 350) { // Revisar cada 350ms
+      delay(10);
       if (pulsos == pul) {  // Cuando el encoder deja de girar
-        Serial.print("Pulso encoder: ");
-        Serial.print(pulsos);
-        Serial.print("Pulso buscando pos final : ");
-        Serial.println(pul);
+        Serial.print("Motor sin giro posicion final seteado: ");
         estado = CERRADO;
       }
       t = now;
@@ -153,7 +152,7 @@ void frenarMotor() {
   do {
     if (c != pulsos) {
       c = pulsos;
-      dis_recorrido_pulsos++;
+
       t = millis();
     } else {
       long now = millis();
@@ -384,17 +383,14 @@ void avanceMotor(float vel_inicial, float vel_final, float distancia) {
         vel = vel + (incremento);
       }
       c = pulsos;
-      dis_recorrido_pulsos++;
+      
       t = now;
 
+      Serial.print("Pulsos: ");
       Serial.print(dis_recorrido_pulsos);
       Serial.print("    v:");
-      Serial.print(vel);
-      Serial.print("    ");
-      Serial.print(dis_recorrido_pulsos * 0.5);
-      Serial.print("cm    ");
-      Serial.print((millis() - tiempo) / 1000);
-      Serial.println("s ");
+      Serial.println(vel);
+     
     } else {
       if (dis_recorrido_pulsos > 60) {
         if (now - t > 1500) {
@@ -415,10 +411,7 @@ void detectarMovimiento() {
     now = millis();
     if (now - t > 200) {
       if (pulsos == pul) {
-        Serial.print("Pulso encoder: ");
-        Serial.print(pulsos);
-        Serial.print(" Pul x: ");
-        Serial.println(pul);
+        Serial.print("No se detecta giro de motor");
         estado = CERRADO;
       }
       t = now;
